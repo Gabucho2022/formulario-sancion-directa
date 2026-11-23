@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Formulario dinámico asistido para confeccionar un Acta por Faltas Leves.">
+  <title>Acta por Faltas Leves</title>
+
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,0&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/app.css" rel="stylesheet">
+</head>
+<body>
+  <img id="institutionLogo" src="assets/img/escudo-santa-fe.png" alt="" hidden>
+
+  <div class="app-shell">
+    <aside class="sidebar d-none d-xl-flex">
+      <div>
+        <div class="institution-lockup">
+          <div class="institution-seal">
+            <img src="assets/img/escudo-santa-fe.png" alt="Escudo de la Provincia de Santa Fe">
+          </div>
+          <div>
+            <p class="eyebrow mb-1">Provincia de Santa Fe</p>
+            <strong class="institution-name">Policía de Santa Fe</strong>
+          </div>
+        </div>
+
+        <div class="sidebar-title-wrap">
+          <span class="sidebar-kicker">Sistema de carga asistida</span>
+          <h1>Acta por<br>Faltas Leves</h1>
+          <p class="sidebar-copy">Una interfaz guiada para completar el acta, asistir la tipificación y reducir omisiones antes de emitir el documento.</p>
+        </div>
+
+        <div id="vueStatus" class="sidebar-features" v-cloak>
+          <div class="sidebar-feature" v-for="item in items" :key="item.label">
+            <span class="material-symbols-rounded">{{ item.icon }}</span>
+            <div>
+              <strong>{{ item.label }}</strong>
+              <small>{{ item.text }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="status-card">
+          <span class="status-pulse"><span></span></span>
+          <div>
+            <strong>Guardado automático</strong>
+            <small>El borrador queda almacenado localmente en este navegador.</small>
+          </div>
+        </div>
+        <small class="sidebar-disclaimer">Prototipo de trabajo sujeto a validación jurídica y administrativa antes de uso institucional.</small>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <div class="title-chip mb-2">
+            <span class="material-symbols-rounded">verified_user</span>
+            Confección asistida
+          </div>
+          <h2 class="page-title mb-1">Nueva acta por faltas leves</h2>
+          <p class="page-subtitle mb-0">Completá los datos paso a paso. La asistencia aparece sólo cuando aporta valor.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="btn btn-surface" id="btnImportSchema" type="button" title="Cargar una plantilla JSON">
+            <span class="material-symbols-rounded">data_object</span><span class="d-none d-md-inline">Plantilla</span>
+          </button>
+          <button class="btn btn-surface" id="btnImportDraft" type="button">
+            <span class="material-symbols-rounded">upload_file</span><span class="d-none d-md-inline">Importar</span>
+          </button>
+          <button class="btn btn-surface" id="btnExportDraft" type="button">
+            <span class="material-symbols-rounded">download</span><span class="d-none d-md-inline">Borrador</span>
+          </button>
+        </div>
+      </header>
+
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <span class="hero-icon"><span class="material-symbols-rounded">assignment</span></span>
+          <div>
+            <p class="eyebrow text-primary mb-1">Formulario dinámico</p>
+            <h3 class="mb-1">Carga clara, ordenada y asistida</h3>
+            <p class="mb-0">Los controles no interrumpen la carga: se muestran de forma contextual y se validan al momento de generar el acta.</p>
+          </div>
+        </div>
+
+        <div class="hero-progress">
+          <div class="d-flex justify-content-between align-items-center gap-3 mb-2">
+            <span class="small fw-semibold text-secondary">Progreso</span>
+            <span class="progress-label" id="progressLabel">0%</span>
+          </div>
+          <div class="progress" role="progressbar" aria-label="Progreso del formulario" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="notice-card" aria-label="Aviso">
+        <span class="material-symbols-rounded">info</span>
+        <div>
+          <strong>Asistencia, no decisión automática.</strong>
+          La aplicación ayuda con la carga y con las reglas incorporadas al prototipo; la tipificación y la medida definitiva corresponden a la autoridad competente.
+        </div>
+      </section>
+
+      <form id="dynamicForm" class="form-stack" novalidate></form>
+
+      <section class="action-dock">
+        <div class="autosave-text">
+          <span class="material-symbols-rounded">cloud_done</span>
+          <span id="saveStatus">Borrador preparado</span>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-outline-secondary" id="btnReset" type="button">
+            <span class="material-symbols-rounded">restart_alt</span> Limpiar
+          </button>
+          <button class="btn btn-outline-primary" id="btnPreview" type="button">
+            <span class="material-symbols-rounded">visibility</span> Vista previa
+          </button>
+          <button class="btn btn-primary btn-generate" id="btnGeneratePdf" type="submit" form="dynamicForm">
+            <span class="material-symbols-rounded">picture_as_pdf</span> Generar PDF
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header preview-modal-header">
+          <div>
+            <p class="eyebrow text-primary mb-1">Vista previa del documento</p>
+            <h2 class="modal-title fs-5" id="previewTitle">Acta por Faltas Leves</h2>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body preview-canvas" id="previewContent"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-surface" data-bs-dismiss="modal">Seguir editando</button>
+          <button type="button" class="btn btn-primary" id="btnGenerateFromPreview">
+            <span class="material-symbols-rounded">picture_as_pdf</span> Generar PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <input id="schemaFileInput" type="file" accept="application/json,.json" hidden>
+  <input id="draftFileInput" type="file" accept="application/json,.json" hidden>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="appToast" class="toast border-0 shadow" role="status" aria-live="polite" aria-atomic="true">
+      <div class="toast-body d-flex align-items-center gap-2">
+        <i class="bi bi-check-circle-fill text-success" id="toastIcon"></i>
+        <span id="toastMessage">Operación realizada.</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script>
+    if (window.Vue) {
+      Vue.createApp({
+        data: () => ({
+          items: [
+            { icon: 'fact_check', label: 'Carga guiada', text: 'Campos ordenados según el acta.' },
+            { icon: 'rule', label: 'Validación contextual', text: 'Controla sin saturar la pantalla.' },
+            { icon: 'description', label: 'Documento listo', text: 'Vista previa y generación en PDF.' }
+          ]
+        })
+      }).mount('#vueStatus');
+    }
+  </script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

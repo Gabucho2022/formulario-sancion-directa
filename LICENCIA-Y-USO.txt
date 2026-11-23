@@ -1,0 +1,10 @@
+PROTOTIPO DE USO INTERNO
+
+Este proyecto es una plantilla tecnológica genérica. No incluye escudo oficial, firma digital, autenticación, expediente electrónico, base de datos ni integración con sistemas institucionales.
+
+Antes de emplearlo en un procedimiento real se debe:
+- Validar el texto y los campos con el área jurídica competente.
+- Definir roles, permisos y trazabilidad.
+- Proteger los datos personales y administrativos.
+- Evitar el almacenamiento de información sensible en equipos compartidos.
+- Sustituir la leyenda "MODELO INTERNO - NO OFICIAL" solamente después de la aprobación correspondiente.
